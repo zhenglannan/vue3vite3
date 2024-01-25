@@ -13,7 +13,7 @@ import {ref} from  'vue'
   setup(props){
     //定义变量
     const count=ref(0)
-    //不要解构
+    //props不要解构
     console.log(props.title);
 
     return {
