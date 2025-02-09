@@ -1,29 +1,25 @@
 <template>
   <button @click="count++">{{ count }}</button>
-  {{title}}
+  {{ title }}
 </template>
 
-<script>
-import {ref} from  'vue'
- export default{
-  name:'DemoItem',
-  props:{
-    title:String
-  },
-
-  setup(props){
-    //定义变量
-    const count=ref(0)
-    //props不要解构
-    console.log(props.title);
-
-    return {
-      count
-    }
-  },
-
-  mounted(){
-    console.log(this.count);
+<script setup>
+import { ref,onMounted } from 'vue'
+//声明props
+const props = defineProps({
+  title: {
+    type: String,
+    default: 'title'
   }
- }
+})
+const count = ref(1)
+
+onMounted(() => {
+  console.log(props.title);
+})
+
+//子组件需要把响应式变量暴露出去
+defineExpose({
+  count,
+})
 </script>

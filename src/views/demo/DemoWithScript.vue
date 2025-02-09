@@ -1,5 +1,5 @@
 <template>
-  <DemoItem title="title"></DemoItem>
+  <DemoItem title="title" ref="DemoItem"></DemoItem>
   <button @click="log">{{ msgg }}</button>
   <!-- <button @click="count++">{{count}}</button> -->
   <button @click="increase($event)">increase {{ count }}</button>
@@ -89,6 +89,7 @@ const fullName = computed({
 // 获取组件
 const inputRef=useTemplateRef('my-input')
 const itemRefs=useTemplateRef('items')
+const DemoItemRef=useTemplateRef('DemoItem')
 
 
 //* 
@@ -123,6 +124,7 @@ onMounted(() => {
 
   inputRef.value.focus();  
   console.log(itemRefs.value);//Proxy(Array) {0: li, 1: li, 2: li}
+  console.log(DemoItemRef.value.count);//Proxy(Array) {0: li, 1: li, 2: li}
   
 })
 //顶层绑定函数
