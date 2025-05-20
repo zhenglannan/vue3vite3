@@ -23,7 +23,7 @@
   <input @keyup.alt.enter="onPageDown">
   <!-- ctrl+点击 -->
   <input @click.ctrl="onPageDown">
-
+  <!-- 只点击ctrl-->
   <input @click.ctrl.exact="onPageDown">
 
   <input v-model.number="age" />
@@ -39,8 +39,8 @@
 <script setup>
 // import {myDirective as vMyDirective} from './xx.js'
 import DemoItem from './DemoItem.vue'
-import { ref, computed, onMounted, watch, watchEffect ,useTemplateRef} from 'vue'
-
+import { ref, computed, onMounted, watch, watchEffect ,useTemplateRef,onWatcherCleanup } from 'vue'
+import {useFetch} from './fetch'
 //声明props
 const props = defineProps({
   foo: {
@@ -48,8 +48,8 @@ const props = defineProps({
     default: 'xx'
   }
 })
-//声明emits
-const emits = defineEmits(['change', 'delete'])
+//声明emit
+const emit = defineEmits(['change', 'delete'])
 
 
 
@@ -91,22 +91,28 @@ const inputRef=useTemplateRef('my-input')
 const itemRefs=useTemplateRef('items')
 const DemoItemRef=useTemplateRef('DemoItem')
 
+const {data,error} =useFetch();
 
 //* 
 // 不能直接侦听响应式对象的属性值,需要用一个返回该属性的 getter 函数
 //在 Vue 3.5+ 中，deep 选项还可以是一个数字，表示最大遍历深度——即 Vue 应该遍历对象嵌套属性的级数
-// /
+// 
 watch(() => obj.value.count, (nVal, oVal) => {
-
+  debugger
 })
-
-// 传入一个响应式对象，会隐式地创建一个深层侦听器
+// 直接侦听一个响应式对象时，侦听器会自动启用深层模式
+//nval 与oval一样
 watch(obj.value, (nVal, oVal) => {
   debugger
 })
 //ref基础数据
 watch(count, (nVal, oVal) => {
   debugger
+
+  // todo 清理副作用???
+  onWatcherCleanup(()=>{
+    console.log("cleanup");
+  })
 })
 
 //watchEffect 是一个更高阶的 watch ��听器，它可以让您在 effect 函数中执行副作用逻辑，并在 effect 停止时自动解除对其的依赖
@@ -121,10 +127,11 @@ watchEffect(async () => {
 
 onMounted(() => {
   console.log(props.foo);
+  emit('change')
 
   inputRef.value.focus();  
   console.log(itemRefs.value);//Proxy(Array) {0: li, 1: li, 2: li}
-  console.log(DemoItemRef.value.count);//Proxy(Array) {0: li, 1: li, 2: li}
+  console.log(DemoItemRef.value.count);//1
   
 })
 //顶层绑定函数
@@ -134,7 +141,7 @@ function log () {
 //event:原生 DOM 事件
 function increase (event) {
   count.value++;
-  // obj.value.count++;
+  obj.value.count++;
 }
 
 function submit (event) {
@@ -153,7 +160,7 @@ const vMyDirective = {
 
 
 
-//?需要把响应式变量暴露出去
+//子组件使用<script setup>需要把响应式变量暴露出去,父组件才可以访问
 defineExpose({
   count,
   msg
